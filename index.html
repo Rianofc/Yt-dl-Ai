@@ -126,7 +126,6 @@
     </video>
     <iframe id="youtubePlayer" style="display: none;" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
-
 <script>
     function loadMedia() {
         var mediaUrl = document.getElementById('mediaUrl').value;
@@ -135,7 +134,7 @@
         var mediaPlayer = document.getElementById('mediaPlayer');
         var mediaSource = document.getElementById('mediaSource');
         var youtubePlayer = document.getElementById('youtubePlayer');
-
+        var { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`);
         if (mediaType === 'video') {
             if (mediaUrl.includes("youtube.com") || mediaUrl.includes("youtu.be")) {
                 audioPlayer.style.display = 'none';
@@ -152,7 +151,6 @@
                 mediaPlayer.play();
             }
         } else if (mediaType === 'audio') {
-            const { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`);
             audioPlayer.style.display = 'block';
             mediaPlayer.style.display = 'none';
             youtubePlayer.style.display = 'none';
@@ -202,7 +200,7 @@
         var mediaUrl = document.getElementById('mediaUrl').value;
         var mediaType = document.getElementById('mediaType').value;
         var a = document.createElement('a');
-        const { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`) 
+        var { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`) 
         if (mediaType === 'video') {
             a.href = data.result.media.mp4;
             a.download = data.result.media.mp4;
