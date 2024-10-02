@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://cdn.sazumi.moe/file/vo4hgd.png" type="image/x-icon">
+<link rel="icon" href="https://cdn.sazumi.moe/file/vo4hgd.png" />
+<meta property="og:image" content="https://cdn.sazumi.moe/file/vo4hgd.png">  	
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Yss - YouTube DL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: url('https://telegra.ph/file/feacb1bc0ca38bd47c899.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        .media-container {
+            margin: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        #audioPlayer, #mediaPlayer, #youtubePlayer {
+            width: 100%;
+            border: none;
+        }
+        #audioPlayer {
+            height: 50px;
+        }
+        #mediaPlayer, #youtubePlayer {
+            height: 400px;
+        }
+        .controls {
+            margin-top: 10px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .controls input, .controls button, .controls select {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .controls button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .controls button:hover {
+            background-color: #218838;
+        }
+        .controls button.search {
+            background-color: #007bff;
+        }
+        .controls button.search:hover {
+            background-color: #0056b3;
+        }
+        #searchResults {
+            max-width: 900px;
+            width: 100%;
+            margin-top: 20px;
+            text-align: left;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .result-button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background-color: #f0ad4e;
+            color: white;
+            display: block;
+            width: calc(100% - 10px);
+            text-align: left;
+        }
+        .result-button:hover {
+            background-color: #ec971f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <label for="mediaType">Select Media Type: </label>
+    <select id="mediaType">
+        <option value="video">Video</option>
+        <option value="audio">Audio</option>
+    </select>
+</div>
+
+<div class="controls">
+    <label for="mediaUrl">Enter Media URL: </label>
+    <input type="text" id="mediaUrl" placeholder="Enter media URL here" size="50">
+    <button onclick="loadMedia()">Load Media</button>
+    <button onclick="unduhMedia()">Download</button>
+</div>
+
+<div class="controls">
+    <label for="searchQuery">Search YouTube: </label>
+    <input type="text" id="searchQuery" placeholder="Enter search query here" size="50">
+    <button class="search" onclick="searchVideo()">Search</button>
+</div>
+
+<div id="searchResults"></div>
+
+<div class="media-container">
+    <audio id="audioPlayer" controls style="display: none;"></audio>
+    <video id="mediaPlayer" controls style="display: none;">
+        <source id="mediaSource" src="" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <iframe id="youtubePlayer" style="display: none;" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+
+<script>
+    function loadMedia() {
+        var mediaUrl = document.getElementById('mediaUrl').value;
+        var mediaType = document.getElementById('mediaType').value;
+        var audioPlayer = document.getElementById('audioPlayer');
+        var mediaPlayer = document.getElementById('mediaPlayer');
+        var mediaSource = document.getElementById('mediaSource');
+        var youtubePlayer = document.getElementById('youtubePlayer');
+
+        if (mediaType === 'video') {
+            if (mediaUrl.includes("youtube.com") || mediaUrl.includes("youtu.be")) {
+                audioPlayer.style.display = 'none';
+                mediaPlayer.style.display = 'none';
+                youtubePlayer.style.display = 'block';
+                var videoId = extractYouTubeID(mediaUrl);
+                youtubePlayer.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&modestbranding=1&showinfo=0&controls=1&rel=0';
+            } else {
+                audioPlayer.style.display = 'none';
+                youtubePlayer.style.display = 'none';
+                mediaPlayer.style.display = 'block';
+                mediaSource.src = mediaUrl;
+                mediaPlayer.load();
+                mediaPlayer.play();
+            }
+        } else if (mediaType === 'audio') {
+            const { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`)
+            audioPlayer.style.display = 'block';
+            mediaPlayer.style.display = 'none';
+            youtubePlayer.style.display = 'none';
+            audioPlayer.src = data.result.media.mp3
+            audioPlayer.load();
+            audioPlayer.play();
+        }
+    }
+
+    function extractYouTubeID(url) {
+        var videoId = '';
+        var urlParts = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+        if (urlParts[2] !== undefined) {
+            videoId = urlParts[2].split(/[^0-9a-z_\-]/i)[0];
+        } else {
+            videoId = urlParts[0];
+        }
+        return videoId;
+    }
+
+    function searchVideo() {
+        var query = document.getElementById('searchQuery').value;
+        var searchResults = document.getElementById('searchResults');
+        searchResults.innerHTML = '';
+
+        fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&key=AIzaSyDjPFsAMyrb_aqHKtmiJr1HCI7Eig4cbEc`)
+            .then(response => response.json())
+            .then(data => {
+                data.items.forEach(item => {
+                    var resultButton = document.createElement('button');
+                    resultButton.className = 'result-button';
+                    resultButton.textContent = item.snippet.title;
+                    resultButton.onclick = function() {
+                        document.getElementById('mediaUrl').value = 'https://www.youtube.com/watch?v=' + item.id.videoId;
+                        loadMedia();
+                    };
+                    searchResults.appendChild(resultButton);
+                });
+            })
+            .catch(error => console.error('Error fetching search results:', error));
+    }
+
+    function unduhMedia() {
+        var mediaUrl = document.getElementById('mediaUrl').value;
+        var mediaType = document.getElementById('mediaType').value;
+        var a = document.createElement('a');
+        const { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`) 
+        if (mediaType === 'video') {
+            a.href = data.result.media.mp4
+            a.download = data.result.media.mp4
+        } else if (mediaType === 'audio') {
+            a.href = data.result.media.mp3
+            a.download = data.result.media.mp3
+        }
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
+
+</body>
+</html>
