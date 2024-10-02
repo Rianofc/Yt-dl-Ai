@@ -152,11 +152,11 @@
                 mediaPlayer.play();
             }
         } else if (mediaType === 'audio') {
-            const { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`)
+            const { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`);
             audioPlayer.style.display = 'block';
             mediaPlayer.style.display = 'none';
             youtubePlayer.style.display = 'none';
-            audioPlayer.src = data.result.media.mp3
+            audioPlayer.src = data.result.media.mp3;
             audioPlayer.load();
             audioPlayer.play();
         }
@@ -201,11 +201,11 @@
         var a = document.createElement('a');
         const { data } = await axios.get(`https://apikita.exonity.xyz/api/ytdlp2-faster?url=${encodeURIComponent(mediaUrl)}`) 
         if (mediaType === 'video') {
-            a.href = data.result.media.mp4
-            a.download = data.result.media.mp4
+            a.href = data.result.media.mp4;
+            a.download = data.result.media.mp4;
         } else if (mediaType === 'audio') {
-            a.href = data.result.media.mp3
-            a.download = data.result.media.mp3
+            a.href = data.result.media.mp3;
+            a.download = data.result.media.mp3;
         }
         document.body.appendChild(a);
         a.click();
