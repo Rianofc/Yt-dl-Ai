@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Haha welino</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <h1>Sang Raja Meme</h1>
+  <div id="video-container"></div>
+  <div id="loading">Loading...</div>
+
+  <script>
+    let cursor = 0;
+    let loading = false;
+
+    async function loadVideos() {
+      if (loading) return;
+      loading = true;
+      document.getElementById("loading").style.display = "block";
+
+      const res = await fetch(`/api/videos?cursor=${cursor}`);
+      const data = await res.json();
+      const container = document.getElementById("video-container");
+
+      data.videos.forEach((video) => {
+        const el = document.createElement("div");
+        el.className = "video-card";
+        el.innerHTML = `
+          <h3>${video.title}</h3>
+          <video src="https://tikwm.com${video.play}" controls preload="none"></video>
+          <p>Duration: ${video.duration}s</p>
+          <p>Views: ${video.play_count.toLocaleString()}</p>
+        `;
+        container.appendChild(el);
+      });
+
+      cursor += data.videos.length;
+      loading = false;
+      document.getElementById("loading").style.display = "none";
+    }
+
+    window.addEventListener("scroll", () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        loadVideos();
+      }
+    });
+
+    loadVideos();
+  </script>
+</body>
+</html>
